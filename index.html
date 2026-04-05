@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Name — Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* =============================================================
+       COLOUR CUSTOMISATION
+       ============================================================= */
+      :root {
+        --dark-bg: #080810;
+        --dark-surface: #10101e;
+        --dark-border: #2a2a3a;
+        --dark-text: #e8e8f0;
+        --dark-muted: #7a7a9a;
+        --dark-accent: #ffffff;
+        --dark-star: #ffffff;
+        --dark-line: rgba(255, 255, 255, 0.18);
+        --dark-glow: rgba(255, 255, 255, 0.04);
+
+        --light-bg: #f5f4f0;
+        --light-surface: #ffffff;
+        --light-border: #d8d8d0;
+        --light-text: #1a1a1a;
+        --light-muted: #7a7a72;
+        --light-accent: #000000;
+
+        --font-display: "Cormorant Garamond", serif;
+        --font-mono: "Space Mono", monospace;
+
+        /* Card border radius — change this one value for all boxes */
+        --radius: 1rem;
+      }
+
+      [data-theme="dark"] {
+        --bg: var(--dark-bg);
+        --surface: var(--dark-surface);
+        --border: var(--dark-border);
+        --text: var(--dark-text);
+        --muted: var(--dark-muted);
+        --accent: var(--dark-accent);
+      }
+      [data-theme="light"] {
+        --bg: var(--light-bg);
+        --surface: var(--light-surface);
+        --border: var(--light-border);
+        --text: var(--light-text);
+        --muted: var(--light-muted);
+        --accent: var(--light-accent);
+      }
+
+      /* =============================================================
+       RESET & BASE
+       ============================================================= */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: var(--font-mono);
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        transition:
+          background 0.5s ease,
+          color 0.5s ease;
+        overflow-x: hidden;
+      }
+
+      /* =============================================================
+       STAR CANVAS
+       ============================================================= */
+      #star-canvas {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: auto;
+        opacity: 1;
+        transition: opacity 0.8s ease;
+        cursor: default;
+      }
+      [data-theme="light"] #star-canvas {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* =============================================================
+       LAYOUT
+       ============================================================= */
+      .page-wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem 2rem;
+        pointer-events: none;
+      }
+      .page-wrap > * {
+        pointer-events: auto;
+      }
+
+      /* =============================================================
+       THEME TOGGLE
+       ============================================================= */
+      .theme-toggle {
+        position: fixed;
+        top: 1.5rem;
+        right: 1.5rem;
+        z-index: 200;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 0.5rem 1rem;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        cursor: pointer;
+        border-radius: 999px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .theme-toggle:hover {
+        background: var(--accent);
+        color: var(--bg);
+        border-color: var(--accent);
+      }
+      .toggle-icon {
+        font-size: 1rem;
+        transition: transform 0.5s ease;
+      }
+      .theme-toggle:hover .toggle-icon {
+        transform: rotate(20deg);
+      }
+
+      /* =============================================================
+       CONSTELLATION TOOLTIP
+       ============================================================= */
+      #constellation-tooltip {
+        position: fixed;
+        z-index: 150;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        padding: 0.35rem 0.7rem;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        white-space: nowrap;
+      }
+
+      /* =============================================================
+       HERO
+       ============================================================= */
+      .hero {
+        padding: 6rem 0 3rem;
+        display: grid;
+        gap: 0.5rem;
+        animation: fadeUp 0.9s ease both;
+      }
+      .hero-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.5rem;
+      }
+      .hero-name {
+        font-family: var(--font-display);
+        font-size: clamp(3.5rem, 9vw, 7rem);
+        font-weight: 300;
+        line-height: 1;
+        color: var(--accent);
+        letter-spacing: -0.01em;
+      }
+      .hero-name em {
+        font-style: italic;
+        opacity: 0.55;
+      }
+      .hero-tagline {
+        font-family: var(--font-display);
+        font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+        font-weight: 300;
+        color: var(--muted);
+        margin-top: 0.75rem;
+        font-style: italic;
+      }
+      .hero-divider {
+        width: 3rem;
+        height: 1px;
+        background: var(--border);
+        margin: 1.5rem 0;
+      }
+      .hero-intro {
+        max-width: 52ch;
+        line-height: 1.8;
+        font-size: 0.82rem;
+        color: var(--text);
+        opacity: 0.85;
+      }
+
+      /* =============================================================
+       SECTION HEADERS
+       ============================================================= */
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .section-label {
+        font-size: 0.65rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .section-rule {
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* =============================================================
+       CARD GRID  — rounded boxes
+       ============================================================= */
+      section {
+        margin-bottom: 3rem;
+        animation: fadeUp 0.9s ease both;
+      }
+      section:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      section:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1rem;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.5rem;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      }
+      [data-theme="dark"] .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--dark-glow);
+        border-radius: var(--radius);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      [data-theme="dark"] .card:hover::before {
+        opacity: 1;
+      }
+
+      .card-icon {
+        font-size: 1.4rem;
+        margin-bottom: 0.75rem;
+        display: block;
+      }
+      .card-title {
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 0.4rem;
+      }
+      .card-body {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        line-height: 1.65;
+        color: var(--text);
+        opacity: 0.8;
+      }
+
+      /* =============================================================
+       CIRCULAR SOCIAL ICON LINKS
+       ============================================================= */
+      .social-dock {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 3rem;
+        animation: fadeUp 0.9s 0.3s ease both;
+      }
+
+      .social-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        text-decoration: none;
+        color: var(--text);
+        transition: all 0.25s ease;
+        position: relative;
+      }
+      .social-icon:hover {
+        background: var(--accent);
+        color: var(--bg);
+        border-color: var(--accent);
+        transform: translateY(-4px) scale(1.1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      }
+      /* Hover tooltip */
+      .social-icon::after {
+        content: attr(data-label);
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 0.4rem;
+        padding: 0.25rem 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        color: var(--text);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      .social-icon:hover::after {
+        opacity: 1;
+      }
+
+      /* =============================================================
+       FOOTER
+       ============================================================= */
+      footer {
+        border-top: 1px solid var(--border);
+        padding-top: 2rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        text-transform: uppercase;
+        animation: fadeUp 0.9s 0.4s ease both;
+      }
+
+      /* =============================================================
+       ANIMATIONS
+       ============================================================= */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .theme-toggle {
+          top: 1rem;
+          right: 1rem;
+        }
+        .hero {
+          padding-top: 4rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="star-canvas"></canvas>
+    <div id="constellation-tooltip"></div>
+
+    <button class="theme-toggle" id="themeBtn" aria-label="Toggle theme">
+      <span class="toggle-icon" id="toggleIcon">☽</span>
+      <span id="toggleLabel">LIGHT</span>
+    </button>
+
+    <div class="page-wrap">
+      <!-- ============================================================
+         HERO — CUSTOMISE: name, tagline, intro paragraph
+         ============================================================ -->
+      <div class="hero">
+        <p class="hero-label">— Introduction</p>
+        <h1 class="hero-name">Your <em>Name</em></h1>
+        <p class="hero-tagline">Designer · Developer · Explorer</p>
+        <div class="hero-divider"></div>
+        <p class="hero-intro">
+          Welcome. I'm a [your role] based in [your city], working on [what you
+          do]. This is a space for my work, writing, and whatever else I'm
+          currently obsessed with. Feel free to explore — and try clicking the
+          stars.
+        </p>
+      </div>
+
+      <!-- ============================================================
+         ABOUT CARDS — CUSTOMISE: icon, title, body
+         ============================================================ -->
+      <section>
+        <div class="section-header">
+          <span class="section-label">About</span>
+          <div class="section-rule"></div>
+        </div>
+        <div class="card-grid">
+          <div class="card">
+            <span class="card-icon">🎯</span>
+            <p class="card-title">Currently</p>
+            <p class="card-body">
+              Working on [project name] and exploring the intersection of [topic
+              A] and [topic B].
+            </p>
+          </div>
+          <div class="card">
+            <span class="card-icon">🛠</span>
+            <p class="card-title">Skills & Tools</p>
+            <p class="card-body">
+              Python · Figma · JavaScript · React · After Effects · [add your
+              tools]
+            </p>
+          </div>
+          <div class="card">
+            <span class="card-icon">📍</span>
+            <p class="card-title">Location</p>
+            <p class="card-body">
+              Based in [Your City]. Available for remote projects worldwide.
+            </p>
+          </div>
+          <div class="card">
+            <span class="card-icon">✦</span>
+            <p class="card-title">Interests</p>
+            <p class="card-body">
+              Astronomy · [Hobby 2] · [Hobby 3] · [Hobby 4]
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+         HIGHLIGHTS — CUSTOMISE: change these to anything you like
+         ============================================================ -->
+      <section>
+        <div class="section-header">
+          <span class="section-label">Highlights</span>
+          <div class="section-rule"></div>
+        </div>
+        <div class="card-grid">
+          <div class="card">
+            <span class="card-icon">🚀</span>
+            <p class="card-title">Latest Project</p>
+            <p class="card-body">
+              [Project Name] — A tool that does [what it does]. Built with
+              [stack].
+            </p>
+          </div>
+          <div class="card">
+            <span class="card-icon">📖</span>
+            <p class="card-title">Reading</p>
+            <p class="card-body">
+              Currently: <em>[Book Title]</em> by [Author]. Previously loved
+              [Another Book].
+            </p>
+          </div>
+          <div class="card">
+            <span class="card-icon">🎵</span>
+            <p class="card-title">Listening</p>
+            <p class="card-body">
+              Heavy rotation: [Artist / Album / Playlist / Podcast]
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+         CIRCULAR SOCIAL ICONS
+         CUSTOMISE: href → your real URL, data-label → tooltip text,
+         emoji → the icon. Add/remove <a> tags freely.
+         ============================================================ -->
+      <div class="social-dock">
+        <a
+          class="social-icon"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          data-label="GitHub"
+          >🐙</a
+        >
+        <a
+          class="social-icon"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          data-label="Twitter"
+          >🐦</a
+        >
+        <a
+          class="social-icon"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          data-label="LinkedIn"
+          >💼</a
+        >
+        <a
+          class="social-icon"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          data-label="Blog"
+          >✍️</a
+        >
+        <a
+          class="social-icon"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          data-label="Portfolio"
+          >🎨</a
+        >
+        <a class="social-icon" href="mailto:you@example.com" data-label="Email"
+          >✉️</a
+        >
+      </div>
+
+      <!-- ============================================================
+         FOOTER — CUSTOMISE: your name
+         ============================================================ -->
+      <footer>
+        <span>© <span id="year"></span> Your Name</span>
+        <span>Made with ✦</span>
+      </footer>
+    </div>
+    <!-- /page-wrap -->
+
+    <script>
+      /* =============================================================
+       CONSTELLATION NODES — CUSTOMISE THESE
+       Each entry is a clickable star in the background.
+
+       label : text shown in the tooltip on hover
+       url   : where clicking takes you. Use "#" as placeholder.
+       x     : horizontal position as a fraction of screen width  (0 = left edge, 1 = right edge)
+       y     : vertical position as a fraction of screen height   (0 = top,  1 = bottom)
+       links : indices of other nodes this star draws a line to
+
+       Add more objects to add more clickable stars.
+       ============================================================= */
+      const NODES = [
+        { label: "GitHub", url: "#", x: 0.1, y: 0.12, links: [1, 2] },
+        { label: "Blog", url: "#", x: 0.26, y: 0.06, links: [0, 3] },
+        { label: "Portfolio", url: "#", x: 0.2, y: 0.3, links: [0, 4] },
+        { label: "Twitter", url: "#", x: 0.44, y: 0.1, links: [1, 5] },
+        { label: "LinkedIn", url: "#", x: 0.36, y: 0.4, links: [2, 5] },
+        { label: "Projects", url: "#", x: 0.58, y: 0.2, links: [3, 4, 6] },
+        { label: "About", url: "#", x: 0.74, y: 0.28, links: [5, 7] },
+        { label: "Contact", url: "#", x: 0.88, y: 0.14, links: [6] },
+      ];
+
+      /* =============================================================
+       STAR FIELD SETTINGS — tweak these if you like
+       ============================================================= */
+      const BG_STARS = 160; /* number of decorative background stars   */
+      const TWINKLE = 0.007; /* twinkle speed                           */
+      const NODE_DOT = 4; /* radius of the constellation node dot    */
+      const NODE_HIT = 20; /* hover / click detection radius in px    */
+
+      /* ============================================================= */
+
+      const canvas = document.getElementById("star-canvas");
+      const ctx = canvas.getContext("2d");
+      const tooltip = document.getElementById("constellation-tooltip");
+
+      let W,
+        H,
+        bgStars = [],
+        animId,
+        hoveredNode = -1;
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        buildBgStars();
+      }
+
+      function buildBgStars() {
+        bgStars = [];
+        for (let i = 0; i < BG_STARS; i++) {
+          bgStars.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: 0.4 + Math.random() * 1.4,
+            a: 0.3 + Math.random() * 0.7,
+            d: (Math.random() - 0.5) * TWINKLE * 2,
+          });
+        }
+      }
+
+      function px(n) {
+        return { x: n.x * W, y: n.y * H };
+      }
+
+      /* ── draw ── */
+      function frame() {
+        ctx.clearRect(0, 0, W, H);
+
+        /* background stars */
+        bgStars.forEach((s) => {
+          s.a += s.d;
+          if (s.a > 1 || s.a < 0.08) s.d *= -1;
+          ctx.globalAlpha = Math.max(0, Math.min(1, s.a));
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        /* constellation lines */
+        NODES.forEach((node, i) => {
+          const a = px(node);
+          node.links.forEach((j) => {
+            if (j <= i) return;
+            const b = px(NODES[j]);
+            const lit = hoveredNode === i || hoveredNode === j;
+
+            /* glow behind lit lines */
+            if (lit) {
+              ctx.globalAlpha = 0.12;
+              ctx.strokeStyle = "#ffffff";
+              ctx.lineWidth = 7;
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.stroke();
+            }
+
+            ctx.globalAlpha = lit ? 0.75 : 0.18;
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = lit ? 1.2 : 0.5;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          });
+        });
+
+        /* constellation nodes */
+        NODES.forEach((node, i) => {
+          const { x, y } = px(node);
+          const lit = hoveredNode === i;
+
+          if (lit) {
+            /* outer pulse rings */
+            ctx.globalAlpha = 0.12;
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(x, y, NODE_DOT * 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 0.25;
+            ctx.beginPath();
+            ctx.arc(x, y, NODE_DOT * 2.8, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          /* dot */
+          ctx.globalAlpha = lit ? 1 : 0.7;
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(x, y, lit ? NODE_DOT * 1.6 : NODE_DOT, 0, Math.PI * 2);
+          ctx.fill();
+
+          /* crosshair */
+          const arm = lit ? NODE_DOT * 4 : NODE_DOT * 2.5;
+          ctx.globalAlpha = lit ? 0.65 : 0.3;
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 0.6;
+          ctx.beginPath();
+          ctx.moveTo(x - arm, y);
+          ctx.lineTo(x + arm, y);
+          ctx.moveTo(x, y - arm);
+          ctx.lineTo(x, y + arm);
+          ctx.stroke();
+        });
+
+        ctx.globalAlpha = 1;
+        animId = requestAnimationFrame(frame);
+      }
+
+      /* ── mouse ── */
+      canvas.addEventListener("mousemove", (e) => {
+        let found = -1;
+        NODES.forEach((n, i) => {
+          const { x, y } = px(n);
+          const d = Math.hypot(x - e.clientX, y - e.clientY);
+          if (d < NODE_HIT) found = i;
+        });
+
+        hoveredNode = found;
+
+        if (found >= 0) {
+          canvas.style.cursor = "pointer";
+          tooltip.textContent = NODES[found].label;
+          tooltip.style.opacity = "1";
+          tooltip.style.left = e.clientX + 18 + "px";
+          tooltip.style.top = e.clientY - 12 + "px";
+        } else {
+          canvas.style.cursor = "default";
+          tooltip.style.opacity = "0";
+        }
+      });
+
+      canvas.addEventListener("mouseleave", () => {
+        hoveredNode = -1;
+        tooltip.style.opacity = "0";
+        canvas.style.cursor = "default";
+      });
+
+      canvas.addEventListener("click", (e) => {
+        NODES.forEach((n) => {
+          const { x, y } = px(n);
+          if (Math.hypot(x - e.clientX, y - e.clientY) < NODE_HIT) {
+            if (n.url && n.url !== "#")
+              window.open(n.url, "_blank", "noopener");
+          }
+        });
+      });
+
+      canvas.addEventListener(
+        "touchstart",
+        (e) => {
+          const t = e.touches[0];
+          NODES.forEach((n) => {
+            const { x, y } = px(n);
+            if (Math.hypot(x - t.clientX, y - t.clientY) < NODE_HIT * 1.5) {
+              e.preventDefault();
+              if (n.url && n.url !== "#")
+                window.open(n.url, "_blank", "noopener");
+            }
+          });
+        },
+        { passive: false },
+      );
+
+      /* ── theme ── */
+      const themeBtn = document.getElementById("themeBtn");
+      const toggleIcon = document.getElementById("toggleIcon");
+      const toggleLabel = document.getElementById("toggleLabel");
+      const html = document.documentElement;
+
+      function startCanvas() {
+        resize();
+        if (!animId) frame();
+      }
+      function stopCanvas() {
+        if (animId) {
+          cancelAnimationFrame(animId);
+          animId = null;
+        }
+        ctx.clearRect(0, 0, W, H);
+      }
+
+      function applyTheme(t) {
+        html.setAttribute("data-theme", t);
+        localStorage.setItem("theme", t);
+        if (t === "dark") {
+          toggleIcon.textContent = "☽";
+          toggleLabel.textContent = "LIGHT";
+          startCanvas();
+        } else {
+          toggleIcon.textContent = "☀";
+          toggleLabel.textContent = "DARK";
+          stopCanvas();
+          tooltip.style.opacity = "0";
+        }
+      }
+
+      themeBtn.addEventListener("click", () =>
+        applyTheme(
+          html.getAttribute("data-theme") === "dark" ? "light" : "dark",
+        ),
+      );
+      window.addEventListener("resize", resize);
+
+      applyTheme(localStorage.getItem("theme") || "dark");
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
